@@ -4,4 +4,5 @@ pub enum Error{
     ReadLine,
     JsonParsing,
     GettingOutput,
+    InvalidQuery,
 }
