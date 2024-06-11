@@ -55,7 +55,9 @@ pub fn get_matched_lines(file_path:String,keys:&Vec<String>,query_vec:&Vec<Strin
             },
             Err(_) => return Err(Error::JsonParsing),
         };
-        if is_matching(query_vec, temp_str){
+        let (result,last)=complete_check(query_vec,&temp_str,&mut 0);
+        println!("{last}");
+        if result{
             res_vec.push(json_obj);
         }
     }
@@ -94,3 +96,92 @@ pub fn is_matching(query_vec:&Vec<String>,line:String)->bool{
     }
     temp
 }
+fn complete_check(query_vec:&Vec<String>,line:&String,index:&mut usize)->(bool,usize){
+
+    let mut temp=true;
+    while *index < query_vec.len(){
+        println!("{index}");
+        let temp_check=&query_vec[*index];
+
+        match temp_check.as_str() { 
+            "and" =>{
+                if temp{
+                    *index += 1;
+                }
+                else{
+                    if !(&query_vec[*index+1] == "("){
+                        *index+=2;
+                    } 
+                    else{
+                        let mut stack:Vec<&String>=Vec::new();
+                        let mut next_variable;
+                        loop{
+                            next_variable=&query_vec[*index];
+                            *index +=1;
+                            if next_variable == "("{
+                                stack.push(next_variable);
+                            }
+                            if next_variable == ")"{
+                                if let Some(_)=stack.last(){
+                                    stack.pop();
+                                }
+                            }
+                            if stack.is_empty(){
+                                break;
+                            }
+                        };
+                        *index += 1;
+                    }
+                }
+            },
+            "or" =>{
+                if temp{
+                    if !(&query_vec[*index+1] == "("){
+                        *index+=2;
+                    } 
+                    else{
+                        let mut stack:Vec<&String>=Vec::new();
+                        let mut next_variable;
+                        loop{
+                            next_variable=&query_vec[*index];
+                            *index +=1;
+                            if next_variable == "("{
+                                stack.push(next_variable);
+                            }
+                            if next_variable == ")"{
+                                if let Some(_)=stack.last(){
+                                    stack.pop();
+                                }
+                            }
+                            if stack.is_empty(){
+                                break;
+                            }
+                        };
+                        *index += 1;
+                    }
+                }
+                else{
+                    *index +=1;
+                }
+            }
+            "(" =>{
+                *index += 1;
+
+                let (inner_temp, new_index) = complete_check(query_vec, line, index);
+                temp = inner_temp;
+                *index = new_index;
+            },
+            ")" =>{
+                *index += 1;
+                return (temp,*index);
+            }
+            _ =>{
+                temp = line.contains(temp_check);
+                *index+=1;
+            }
+        }
+    }
+    (temp,*index)
+}
+
+

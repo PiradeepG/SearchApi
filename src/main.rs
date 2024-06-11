@@ -9,3 +9,8 @@ pub fn search_query(file_path:String,query_string:String)-> Result<Vec<Value>,Er
 
     Ok(get_matched_lines(file_path, &keys, &query_vec))?
 }
+
+fn main(){
+    let temp=search_query(String::from("/home/piradeep/Downloads/sample_data_mixed_lines.json"), String::from("( class:10 and gender:M ) or age:18")).unwrap();
+    println!("{:#?}::{}",temp,temp.len());
+}
