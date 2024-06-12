@@ -9,4 +9,3 @@ pub fn search_query(file_path:String,query_string:String)-> Result<Vec<Value>,Er
 
     Ok(get_matched_lines(file_path, &keys, &query_vec))?
 }
-
