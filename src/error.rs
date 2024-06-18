@@ -5,4 +5,5 @@ pub enum Error {
     JsonParsing,
     GettingOutput,
     InvalidQuery,
+    InvalidBraces,
 }
