@@ -2,7 +2,9 @@ use crate::error::Error;
 use serde_json::Value;
 use std::{
     fs::File,
-    io::{BufRead, BufReader}, sync::{Arc, Mutex}, thread,
+    io::{BufRead, BufReader},
+    sync::{Arc, Mutex},
+    thread,
 };
 
 pub fn get_keys_and_query(query: String) -> Result<(Vec<String>, Vec<String>), Error> {
@@ -34,13 +36,13 @@ pub fn get_keys_and_query(query: String) -> Result<(Vec<String>, Vec<String>), E
                 }
             }
             "and" | "or" => {
-                if query_parts[i+1] == ")" || query_parts[i+1]=="("{
+                if query_parts[i + 1] == ")" || query_parts[i + 1] == "(" {
                     return Err(Error::InvalidQuery);
                 }
             }
             _ => {}
         }
-        
+
         let temp_check = query_parts[i].split(':').collect::<Vec<&str>>()[0].to_string();
         if !key_vec.contains(&temp_check) {
             key_vec.push(temp_check);
@@ -70,8 +72,8 @@ pub fn get_matched_lines(
         .collect::<Result<_, _>>()
         .map_err(|_| Error::ReadLine)?;
 
-    let num_threads = 4; 
-    let chunk_size = (lines.len() + num_threads - 1) / num_threads; 
+    let num_threads = 4;
+    let chunk_size = (lines.len() + num_threads - 1) / num_threads;
 
     let keys = Arc::new(keys.clone());
     let query_vec = Arc::new(query_vec.clone());
@@ -119,7 +121,6 @@ pub fn get_matched_lines(
     let res_vec = Arc::try_unwrap(result_vec).unwrap().into_inner().unwrap();
     Ok(res_vec)
 }
-
 
 fn complete_check(query_vec: &Vec<String>, line: &String, index: &mut usize) -> (bool, usize) {
     let mut temp = true;
@@ -171,7 +172,7 @@ fn complete_check(query_vec: &Vec<String>, line: &String, index: &mut usize) -> 
                             if next_variable == ")" {
                                 if let Some(_) = stack.last() {
                                     stack.pop();
-                                  }
+                                }
                             }
                             if stack.is_empty() {
                                 break;
