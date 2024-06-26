@@ -10,11 +10,13 @@ pub fn search_query(file_path: String, query_string: String) -> Result<Vec<Value
 }
 
 fn main() {
+
+
     match search_query(
-        String::from("/home/piradeep/Downloads/sample_data_mixed_lines.json"),
+        String::from("/home/piradeep/Downloads/random_data_single_line.json"),
         String::from("class:10"),
     ) {
-        Ok(msg) => println!("{:#?}", msg),
+        Ok(msg) => println!("{:#?}",msg),
         Err(err) => println!("{:?}", err),
     };
 }
